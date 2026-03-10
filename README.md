@@ -52,6 +52,8 @@ Current environment variables:
 - `OLLAMA_BASE_URL`: Ollama server URL
 - `OLLAMA_CHAT_MODEL`: model used for answer generation
 - `OLLAMA_EMBED_MODEL`: model used for embeddings
+- `INGEST_DEFAULT_FILES`: if `true`, ingest files from `base_files/` during backend startup
+- `BASE_FILES_DIR`: optional override for the startup-ingest folder
 - `INNGEST_API_BASE`: optional override for polling Inngest dev API
 - `QDRANT_URL`: optional override for Qdrant
 - `QDRANT_COLLECTION`: optional override for the collection name
@@ -62,6 +64,7 @@ Example:
 OLLAMA_BASE_URL=http://127.0.0.1:11434
 OLLAMA_CHAT_MODEL=phi3:3.8b
 OLLAMA_EMBED_MODEL=nomic-embed-text
+INGEST_DEFAULT_FILES=false
 ```
 
 ## Pull Ollama Models
@@ -96,6 +99,19 @@ This starts:
 
 Then open the Streamlit URL shown in your terminal.
 
+### Optional default ingest
+
+If you want the backend to ingest local files automatically on startup:
+
+1. Set `INGEST_DEFAULT_FILES=true` in `.env`.
+2. Create a `base_files/` folder in the project root.
+3. Put supported files in that folder.
+4. Restart the app.
+
+By default the app scans `base_files/` recursively for `pdf`, `txt`, `md`, and `docx` files. You can override that folder with `BASE_FILES_DIR`.
+
+Startup ingest upserts deterministic IDs, so restarting the app will refresh those files instead of creating duplicate vector IDs for the same source/chunk combination.
+
 ## How It Works
 
 ### Ingest flow
@@ -106,6 +122,8 @@ Then open the Streamlit URL shown in your terminal.
 4. The backend loads and chunks the document.
 5. Chunks are embedded with Ollama.
 6. Vectors and source metadata are stored in Qdrant.
+
+The same ingest pipeline is also used for optional startup ingestion from `base_files/`.
 
 ### Query flow
 
@@ -131,5 +149,6 @@ Key files:
 ## Notes
 
 - Supported upload types are `pdf`, `txt`, `md`, and `docx`.
+- Optional startup ingest scans `base_files/` recursively when `INGEST_DEFAULT_FILES=true`.
 - Uploaded files are stored locally in `uploads/`.
 - `.env` is ignored by git; use `.env.example` as the shared template.

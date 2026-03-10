@@ -41,7 +41,7 @@ async def send_rag_ingest_event(file_path: Path) -> None:
     )
 
 
-st.title("Upload a Document to Ingest")
+st.title("Upload a Document...")
 uploaded = st.file_uploader(
     "Choose a document",
     type=SUPPORTED_EXTENSIONS,
@@ -59,7 +59,7 @@ if uploaded is not None:
     st.caption("Supported types: PDF, TXT, Markdown, and DOCX.")
 
 st.divider()
-st.title("Ask a question about your documents")
+st.title("Ask a question...")
 
 
 async def send_rag_query_event(question: str, top_k: int) -> None:

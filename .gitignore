@@ -10,3 +10,4 @@ wheels/
 .venv
 /uploads
 .env
+base_files/

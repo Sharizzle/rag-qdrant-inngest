@@ -9,6 +9,7 @@ from ollama_client import embed_texts as ollama_embed_texts
 load_dotenv()
 
 splitter = SentenceSplitter(chunk_size=1000, chunk_overlap=200)
+SUPPORTED_FILE_SUFFIXES = {".pdf", ".txt", ".md", ".docx"}
 
 
 def _load_pdf_text(path: str) -> list[str]:
