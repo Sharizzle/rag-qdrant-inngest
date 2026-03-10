@@ -10,14 +10,16 @@ import requests
 
 load_dotenv()
 
-st.set_page_config(page_title="RAG Ingest PDF", page_icon="📄", layout="centered")
+SUPPORTED_EXTENSIONS = ["pdf", "txt", "md", "docx"]
+
+st.set_page_config(page_title="RAG Ingest Documents", page_icon="📄", layout="centered")
 
 
 def create_inngest_client() -> inngest.Inngest:
     return inngest.Inngest(app_id="rag_app", is_production=False)
 
 
-def save_uploaded_pdf(file) -> Path:
+def save_uploaded_file(file) -> Path:
     uploads_dir = Path("uploads")
     uploads_dir.mkdir(parents=True, exist_ok=True)
     file_path = uploads_dir / file.name
@@ -26,34 +28,38 @@ def save_uploaded_pdf(file) -> Path:
     return file_path
 
 
-async def send_rag_ingest_event(pdf_path: Path) -> None:
+async def send_rag_ingest_event(file_path: Path) -> None:
     client = create_inngest_client()
     await client.send(
         inngest.Event(
-            name="rag/ingest_pdf",
+            name="rag/ingest_file",
             data={
-                "pdf_path": str(pdf_path.resolve()),
-                "source_id": pdf_path.name,
+                "file_path": str(file_path.resolve()),
+                "source_id": file_path.name,
             },
         )
     )
 
 
-st.title("Upload a PDF to Ingest")
-uploaded = st.file_uploader("Choose a PDF", type=["pdf"], accept_multiple_files=False)
+st.title("Upload a Document to Ingest")
+uploaded = st.file_uploader(
+    "Choose a document",
+    type=SUPPORTED_EXTENSIONS,
+    accept_multiple_files=False,
+)
 
 if uploaded is not None:
     with st.spinner("Uploading and triggering ingestion..."):
-        path = save_uploaded_pdf(uploaded)
+        path = save_uploaded_file(uploaded)
         # Kick off the event and block until the send completes
         asyncio.run(send_rag_ingest_event(path))
         # Small pause for user feedback continuity
         time.sleep(0.3)
     st.success(f"Triggered ingestion for: {path.name}")
-    st.caption("You can upload another PDF if you like.")
+    st.caption("Supported types: PDF, TXT, Markdown, and DOCX.")
 
 st.divider()
-st.title("Ask a question about your PDFs")
+st.title("Ask a question about your documents")
 
 
 async def send_rag_query_event(question: str, top_k: int) -> None:

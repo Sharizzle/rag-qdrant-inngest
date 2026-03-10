@@ -4,7 +4,7 @@ A small local RAG app built with Streamlit, FastAPI, Inngest, Qdrant, and Ollama
 
 You can:
 
-- upload a PDF for ingestion
+- upload documents for ingestion
 - chunk and embed it with Ollama
 - store vectors in Qdrant
 - ask questions in Streamlit
@@ -100,10 +100,10 @@ Then open the Streamlit URL shown in your terminal.
 
 ### Ingest flow
 
-1. Upload a PDF in the Streamlit app.
+1. Upload a supported document in the Streamlit app.
 2. The UI saves the file into `uploads/`.
-3. Streamlit sends a `rag/ingest_pdf` event to Inngest.
-4. The backend loads and chunks the PDF.
+3. Streamlit sends a `rag/ingest_file` event to Inngest.
+4. The backend loads and chunks the document.
 5. Chunks are embedded with Ollama.
 6. Vectors and source metadata are stored in Qdrant.
 
@@ -121,7 +121,7 @@ Key files:
 
 - `streamlit_app.py`: UI for upload and querying
 - `main.py`: Inngest-backed ingestion and query functions
-- `data_loader.py`: PDF loading, chunking, and embedding bridge
+- `data_loader.py`: document loading, chunking, and embedding bridge
 - `ollama_client.py`: direct Ollama chat and embedding calls
 - `vector_db.py`: Qdrant collection and search logic
 - `custom_types.py`: Pydantic models for workflow outputs
@@ -130,6 +130,6 @@ Key files:
 
 ## Notes
 
-- The app currently ingests PDFs only.
-- Uploaded PDFs are stored locally in `uploads/`.
+- Supported upload types are `pdf`, `txt`, `md`, and `docx`.
+- Uploaded files are stored locally in `uploads/`.
 - `.env` is ignored by git; use `.env.example` as the shared template.
